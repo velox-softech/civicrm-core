@@ -131,7 +131,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ((string ) $activitySetXML->name == $activitySetName) {
           $activityTypes = array();
-          $allActivityTypes = &$this->allActivityTypes();
+          $allActivityTypes = &$this->allActivityTypes(TRUE, TRUE);
           foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
             foreach ($activityTypesXML as $activityTypeXML) {
               $activityTypeName = (string ) $activityTypeXML->name;
@@ -174,13 +174,6 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   public function getActivities($clientID, $caseID, $activityTypes, &$activities) {
     // get all activities for this case that in this activityTypes set
     foreach ($activityTypes as $aType) {
-      $map[$aType['id']] = $aType;
-    }
-
-    // get all core activities
-    $coreActivityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
-
-    foreach ($coreActivityTypes as $aType) {
       $map[$aType['id']] = $aType;
     }
 
@@ -759,7 +752,7 @@ LIMIT  1
     $case = $form->caseInfo($clientID, $caseID);
     $template->assign_by_ref('case', $case);
 
-    if ($params['include_activities'] == 1) {
+    if (isset($params['include_activities']) && $params['include_activities'] == 1) {
       $template->assign('includeActivities', 'All');
     }
     else {
@@ -776,7 +769,7 @@ LIMIT  1
       $activityTypes = $form->getActivityTypes($xml, $activitySetName);
     }
     else {
-      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes();
+      $activityTypes = CRM_Case_XMLProcessor::allActivityTypes(TRUE,TRUE);
     }
 
     if (!$activityTypes) {
